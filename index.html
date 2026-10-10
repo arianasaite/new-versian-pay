@@ -1007,6 +1007,13 @@ const toman = n => fa(n) + ' تومان';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 
+function hexToRgba(hex, a=1){
+  const m = String(hex||'').match(/^#?([0-9a-f]{6})$/i);
+  if(!m) return `rgba(163,139,255,${a})`;
+  const n = parseInt(m[1], 16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+  
 let sb = null;
 let currentUser = null;
 let currentRole = 'viewer';
@@ -1217,6 +1224,7 @@ function openProduct(id){
   $('#pdAdd').innerHTML = p.stock <= 0 ? 'ناموجود' : 'افزودن به سبد ＋';
   const on = state.wishlist.includes(id);
   $('#pdWish').textContent = on ? '♥ حذف' : '♥ علاقه‌مندی';
+    document.documentElement.style.setProperty('--product-glow', hexToRgba(p.color, .32));
   $('#productPage').hidden = false;
   document.body.classList.add('product-open');
   window.scrollTo({top:0, behavior:'smooth'});
@@ -1653,6 +1661,8 @@ function applyTheme(name){
   document.documentElement.style.setProperty('--accent', t.a);
   document.documentElement.style.setProperty('--accent-2', t.a2);
   document.documentElement.style.setProperty('--hot', t.hot);
+    document.documentElement.style.setProperty('--glow', hexToRgba(t.a, .34));
+  document.documentElement.style.setProperty('--product-glow', hexToRgba(t.a, .28));
   if(!state.light){
     document.documentElement.style.setProperty('--bg', t.bg);
     document.documentElement.style.setProperty('--bg-2', t.bg2);
@@ -1942,6 +1952,13 @@ async function boot(){
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+  
+  // هاله نور پشت موس
+  window.addEventListener('pointermove', e => {
+    document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+    document.documentElement.style.setProperty('--my', e.clientY + 'px');
+  }, { passive:true });
+  
 }
 boot();
 </script>
